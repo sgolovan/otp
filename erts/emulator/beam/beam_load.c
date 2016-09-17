@@ -46,7 +46,7 @@
 #include "hipe_arch.h"
 #endif
 
-ErlDrvBinary* erts_gzinflate_buffer(char*, int);
+#include "gzio.h"
 
 #define MAX_OPARGS 8
 #define CALLED    0
