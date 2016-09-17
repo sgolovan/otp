@@ -188,7 +188,7 @@ ppc_init__(void)
 void
 ethr_x86_cpuid__(int *eax, int *ebx, int *ecx, int *edx)
 {
-#if ETHR_SIZEOF_PTR == 4
+#if ETHR_SIZEOF_PTR == 4 && !(__x86_64__ && __ILP32__)
     int have_cpuid;
     /*
      * If it is possible to toggle eflags bit 21,
@@ -215,7 +215,7 @@ ethr_x86_cpuid__(int *eax, int *ebx, int *ecx, int *edx)
 	return;
     }
 #endif
-#if ETHR_SIZEOF_PTR == 4 && defined(__PIC__) && __PIC__
+#if ETHR_SIZEOF_PTR == 4 && !(__x86_64__ && __ILP32__) && defined(__PIC__) && __PIC__
     /*
      * When position independet code is used in 32-bit mode, the B register
      * is used for storage of global offset table address, and we may not
