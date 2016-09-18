@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <openssl/opensslv.h>
 #include <openssl/opensslconf.h>
 
 #include "erl_nif.h"
@@ -62,7 +63,11 @@ static void nomem(size_t size, const char* op)
     abort();
 }
 
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+static void* crypto_alloc(size_t size, const char* file, int line)
+#else
 static void* crypto_alloc(size_t size)
+#endif
 {
     void *ret = enif_alloc(size);
 
@@ -70,7 +75,12 @@ static void* crypto_alloc(size_t size)
 	nomem(size, "allocate");
     return ret;
 }
+
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+static void* crypto_realloc(void* ptr, size_t size, const char* file, int line)
+#else
 static void* crypto_realloc(void* ptr, size_t size)
+#endif
 {
     void* ret = enif_realloc(ptr, size);
 
@@ -78,13 +88,18 @@ static void* crypto_realloc(void* ptr, size_t size)
 	nomem(size, "reallocate");
     return ret;
 }
+
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+static void crypto_free(void* ptr, const char* file, int line)
+#else
 static void crypto_free(void* ptr)
+#endif
 {
     enif_free(ptr);
 }
 
 
-#ifdef OPENSSL_THREADS /* vvvvvvvvvvvvvvv OPENSSL_THREADS vvvvvvvvvvvvvvvv */
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L) && defined(OPENSSL_THREADS)
 
 static ErlNifRWLock** lock_vec = NULL; /* Static locks used by openssl */
 
@@ -135,7 +150,7 @@ static void dyn_destroy_function(struct CRYPTO_dynlock_value *ptr, const char *f
     enif_rwlock_destroy((ErlNifRWLock*)ptr);
 }
 
-#endif /* ^^^^^^^^^^^^^^^^^^^^^^ OPENSSL_THREADS ^^^^^^^^^^^^^^^^^^^^^^ */
+#endif /* (OPENSSL_VERSION_NUMBER < 0x10100000L) && defined(OPENSSL_THREADS) */
 
 DLLEXPORT struct crypto_callbacks* get_crypto_callbacks(int nlocks)
 {
@@ -147,7 +162,7 @@ DLLEXPORT struct crypto_callbacks* get_crypto_callbacks(int nlocks)
 	&crypto_realloc,
 	&crypto_free,
         
-#ifdef OPENSSL_THREADS
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L) && defined(OPENSSL_THREADS)
 	&locking_function,
 	&id_function,
 	&dyn_create_function,
@@ -157,7 +172,7 @@ DLLEXPORT struct crypto_callbacks* get_crypto_callbacks(int nlocks)
     };
 
     if (!is_initialized) {
-#ifdef OPENSSL_THREADS
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L) && defined(OPENSSL_THREADS)
 	if (nlocks > 0) {
 	    int i;
 	    lock_vec = enif_alloc(nlocks*sizeof(*lock_vec));

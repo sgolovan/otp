@@ -18,6 +18,21 @@
  * %CopyrightEnd%
  */
 
+#include <openssl/opensslv.h>
+
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+
+struct crypto_callbacks
+{
+    size_t sizeof_me;
+
+    void* (*crypto_alloc)(size_t size, const char* file, int line);
+    void* (*crypto_realloc)(void* ptr, size_t size, const char* file, int line);
+    void (*crypto_free)(void* ptr, const char* file, int line);
+};
+
+#else
+
 struct crypto_callbacks
 {
     size_t sizeof_me;
@@ -38,6 +53,8 @@ struct crypto_callbacks
 				 const char *file, int line);
   #endif /* OPENSSL_THREADS */
 };
+
+#endif
 
 typedef struct crypto_callbacks* get_crypto_callbacks_t(int nlocks);
 

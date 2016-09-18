@@ -4234,10 +4234,15 @@ yes
 					fi
  					AC_TRY_LINK([
 					#include <stdio.h>
+					#include <openssl/opensslv.h>
  					#include <openssl/hmac.h>],
  					[ 
+					#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+					HMAC_CTX *hc = HMAC_CTX_new();
+					#else
  					HMAC_CTX hc;
  					HMAC_CTX_init(&hc);		
+					#endif
  					],
  					[ssl_linkable=yes],
  					[ssl_linkable=no])
@@ -4290,10 +4295,15 @@ dnl		so it is - be adoptable
 			LIBS="$SSL_LIBDIR/libcrypto.a $STATIC_ZLIB_LIBS"
  			AC_TRY_LINK([
 			#include <stdio.h>
+			#include <openssl/opensslv.h>
  			#include <openssl/hmac.h>],
  			[ 
+			#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+			HMAC_CTX *hc = HMAC_CTX_new();
+			#else
  			HMAC_CTX hc;
  			HMAC_CTX_init(&hc);		
+			#endif
  			],
  			[ssl_dyn_linkable=yes],
  			[ssl_dyn_linkable=no])
@@ -4402,9 +4412,12 @@ if test "x$SSL_APP" != "x" ; then
     old_CPPFLAGS=$CPPFLAGS
     CPPFLAGS=$SSL_INCLUDE
     AC_EGREP_CPP(^yes$,[
+#include <openssl/opensslv.h>
 #include <openssl/opensslconf.h>
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 #ifndef OPENSSL_NO_KRB5
 yes
+#endif
 #endif
       ],[
       AC_MSG_RESULT([yes])
@@ -4551,11 +4564,16 @@ yes)   # Use standard lib locations for ssl runtime library path
 	LIBS="-lcrypto"
 	AC_TRY_LINK([
                          #include <stdio.h>
+                         #include <openssl/opensslv.h>
                          #include <openssl/hmac.h>
                     ],
                     [ 
+                         #if OPENSSL_VERSION_NUMBER >= 0x10100000L
+                         HMAC_CTX *hc = HMAC_CTX_new();
+                         #else
                          HMAC_CTX hc;
                          HMAC_CTX_init(&hc);		
+                         #endif
                     ],
                     [rpath_success=yes],
                     [rpath_success=no])
