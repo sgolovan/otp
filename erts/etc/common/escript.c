@@ -55,7 +55,7 @@ static int eargc;		/* Number of arguments in eargv. */
 #  define IS_DIRSEP(c) ((c) == '/')
 #  define DIRSEPSTR "/"
 #  define PATHSEPSTR ":"
-#  define PMAX PATH_MAX
+#  define PMAX MAXPATHLEN
 #  define ERL_NAME "erl"
 #endif
 

@@ -119,13 +119,13 @@ set_env(char *key, char *value)
 // static char *
 // follow_symlinks(const char *path, char *resolved_path)
 // {
-//     char tmp[PATH_MAX];
+//     char tmp[MAXPATHLEN];
 //     int  len; 
 // 
 //     strcpy(resolved_path, path);
 //     
 //     for (;;) {
-// 	len = readlink(resolved_path, tmp, PATH_MAX);
+// 	len = readlink(resolved_path, tmp, MAXPATHLEN);
 // 
 // 	if (len == -1) {
 // 	    if (errno == EINVAL) {
@@ -150,8 +150,8 @@ set_env(char *key, char *value)
 static char *
 find_prog(char *origpath)
 {
-    char relpath[PATH_MAX];
-    char abspath[PATH_MAX];
+    char relpath[MAXPATHLEN];
+    char abspath[MAXPATHLEN];
 
     strcpy(relpath, origpath);
 
@@ -162,7 +162,7 @@ find_prog(char *origpath)
         envpath = get_env("PATH");
         if (envpath) {
             /* Try to find the executable in the path */
-            char dir[PATH_MAX];
+            char dir[MAXPATHLEN];
             char *beg = envpath;
             char *end;
             int sz;
@@ -274,9 +274,9 @@ static char *
 find_erts_vsn(char *erl_top)
 {
     /* List install dir and look for latest erts-vsn */
-    DIR *dp;                    /* Pointer to directory structure. */
-    struct dirent* dirp;        /* Pointer to directory entry.     */
-    char latest_vsn[PATH_MAX];  /* Latest erts-vsn directory name. */
+    DIR *dp;                     /* Pointer to directory structure. */
+    struct dirent* dirp;         /* Pointer to directory entry.     */
+    char latest_vsn[MAXPATHLEN]; /* Latest erts-vsn directory name. */
 
     dp = opendir(erl_top);
     if (dp == NULL) {
@@ -316,7 +316,7 @@ find_bindir(char *erlpath)
 
     char *p;
     char *p2;
-    char buffer[PATH_MAX];
+    char buffer[MAXPATHLEN];
 
     strcpy(buffer, erlpath);
 
@@ -358,10 +358,10 @@ main(int argc, char **argv)
 {
     char *p;
     char *abspath;
-    char *bindir;            /* Location of executables. */
-    char rootdir[PATH_MAX];  /* Root location of Erlang installation. */
-    char progname[PATH_MAX]; /* Name of this program. */
-    char erlexec[PATH_MAX];  /* Path to erlexec */
+    char *bindir;              /* Location of executables. */
+    char rootdir[MAXPATHLEN];  /* Root location of Erlang installation. */
+    char progname[MAXPATHLEN]; /* Name of this program. */
+    char erlexec[MAXPATHLEN];  /* Path to erlexec */
 
     /* Determine progname */
     abspath = find_prog(argv[0]);

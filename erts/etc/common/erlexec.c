@@ -1606,7 +1606,7 @@ get_parameters(int argc, char** argv)
     if (!bindir) {
 	/* Determine bindir from absolute path to executable */
 	char *p;
-	char buffer[PATH_MAX];
+	char buffer[MAXPATHLEN];
 	strncpy(buffer, argv[0], sizeof(buffer));
 	buffer[sizeof(buffer)-1] = '\0';
 	
@@ -1620,7 +1620,7 @@ get_parameters(int argc, char** argv)
     if (!rootdir) {
 	/* Determine rootdir from absolute path to bindir */
 	char *p;
-	char buffer[PATH_MAX];
+	char buffer[MAXPATHLEN];
 	strncpy(buffer, bindir, sizeof(buffer));
 	buffer[sizeof(buffer)-1] = '\0';
 	
